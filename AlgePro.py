@@ -5,9 +5,12 @@ import matplotlib.pyplot as plt
 puntos = []
 puntosBU=[]
 grupos = []
+valorQ = 0
+MatU = []
 colorPuntos = ['bo', 'go', 'ro', 'co', 'mo', 'yo', 'ko', 'wo']
 colorGrupos = ['b^', 'g^', 'r^', 'c^', 'm^', 'y^', 'k^', 'w^']
-
+centroidesX = []
+centroidesY = []
 
 #Variables globales provicionales
 tProv = 80
@@ -67,18 +70,64 @@ def seleccionarGrupos(nGrupos):
 def calcularDistancia(grupo, punto):
     grupo = grupo[:-1]
     punto = punto[:-1]
-    print(grupo)
-    print(punto)
     from scipy.spatial import distance
     dis = distance.euclidean(grupo,punto)
-    print("distancia: ", dis)
+    return dis
 
-def test():
-    crearPuntos(5)
-    seleccionarGrupos(2)
-    print("puntos: ", puntos)
-    print("grupos: ", grupos)
-    calcularDistancia(grupos[1],puntos[2])
+def test(N,K):
+    crearPuntos(N)
+    seleccionarGrupos(K)
+    pintaPuntos()
+
+def iterador():
+    calcularMatrizU()
+    agrupador()
+    pintaPuntos()
+
+def calcularMatrizU():
+    temp = []
+    temp2 = []
+    global puntos, grupos, MatU, valorQ
+    for i in puntos:
+        temp = []
+        temp2 = []
+        for j in grupos:
+            dist=calcularDistancia(j,i)
+            temp += [dist]
+            temp2 += [[j,i,dist]]
+        indice=temp.index(min(temp))
+        valorQ += min(temp)
+        MatU+= [temp2[indice]]
+        
+    
+def agrupador():
+    global MatU, puntos
+    for i in MatU:
+        if i[1] in grupos:
+            modificarColorPunto(i[1],i[0][2])
+        else:
+            modificarColorPunto(i[1],i[0][2].replace('^','o'))
+
+def calcularMedia(indice):
+    global MatU, grupos, centroidesX,centroidesY
+    temp = []
+    for i in grupos:
+        temp = []
+        for j in MatU:
+            if i == j[0]:
+                temp += [j[1][indice]] #indice 0 para x y 1 para y
+        print(temp)        
+        if indice == 0:
+            centroidesX+=[float(sum(temp)) / max(len(temp), 1)]
+        else:
+            centroidesY+=[float(sum(temp)) / max(len(temp), 1)]
+
+def limpiarLista(lista):
+    cleanlist=[]
+    for i in lista:
+        if i not in cleanlist:
+            cleanlist.append(i)
+    return cleanlist    
     
 ##UIX
     
@@ -86,10 +135,5 @@ def pintaPuntos():
     global puntos
     for i in puntos:
         plt.plot(i[0],i[1],i[2])
-    
     plt.axis([0, 100, 0, 100])
-    from matplotlib.widgets import Button
-    axnext = plt.axes([0.81, 0.05, 0.1, 0.075])
-    bnext = Button(axnext, 'Iterar')
-    bnext.on_clicked(test)
     plt.show()
