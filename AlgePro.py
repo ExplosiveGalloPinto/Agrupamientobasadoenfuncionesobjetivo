@@ -6,6 +6,7 @@ puntos = []
 puntosBU=[]
 grupos = []
 valorQ = 0
+valorQtemp = 0
 MatU = []
 colorPuntos = ['bo', 'go', 'ro', 'co', 'mo', 'yo', 'ko', 'wo']
 colorGrupos = ['b^', 'g^', 'r^', 'c^', 'm^', 'y^', 'k^', 'w^']
@@ -80,14 +81,27 @@ def test(N,K):
     pintaPuntos()
 
 def iterador():
+    global centroidesX, centroidesY
+    centroidesX = []
+    centroidesY = []
     calcularMatrizU()
     agrupador()
+    calcularMedia(0)
+    calcularMedia(1)
     pintaPuntos()
+    actualizarCentroide()
+    print("Q previo: ", valorQtemp)
+    print("Q actual: ", valorQ)
+
+    
 
 def calcularMatrizU():
     temp = []
     temp2 = []
-    global puntos, grupos, MatU, valorQ
+    global puntos, grupos, MatU, valorQ, valorQtemp
+    MatU = []
+    valorQtemp = valorQ
+    valorQ = 0
     for i in puntos:
         temp = []
         temp2 = []
@@ -122,7 +136,17 @@ def calcularMedia(indice):
         else:
             centroidesY+=[float(sum(temp)) / max(len(temp), 1)]
 
-def limpiarLista(lista):
+def actualizarCentroide():
+    global grupos,puntos,centroidesX,centroidesY
+    for i in grupos:
+        for j in puntos:
+            if i == j:
+                i[0] = centroidesX[grupos.index(i)]
+                i[1] = centroidesY[grupos.index(i)]
+                j[0] = centroidesX[grupos.index(i)]
+                j[1] = centroidesY[grupos.index(i)]
+
+def limpiarLista(lista): #CLEAN TALVEZ INNECESARIO
     cleanlist=[]
     for i in lista:
         if i not in cleanlist:
