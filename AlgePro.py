@@ -14,7 +14,7 @@ centroidesX = []
 centroidesY = []
 
 #Variables globales provicionales
-tProv = 80
+tProv = 99
 def validarPunto(punto,lista):
     if punto==[]: #Valida si el punto es vacio
         return False
@@ -64,7 +64,7 @@ def seleccionarGrupos(nGrupos):
     while nGrupos>0:
         indice = randomizer(0,len(puntos)-1)
         if validarPunto(puntos[indice],grupos):
-            modificarColorPunto(puntos[indice],colorGrupos[nGrupos])
+            modificarColorPunto(puntos[indice],colorGrupos[nGrupos-1])
             grupos += [puntos[indice]]
             nGrupos-=1
 
@@ -78,7 +78,7 @@ def calcularDistancia(grupo, punto):
 def test(N,K):
     crearPuntos(N)
     seleccionarGrupos(K)
-    pintaPuntos()
+    #pintaPuntos()
 
 def iterador():
     global centroidesX, centroidesY
@@ -88,13 +88,21 @@ def iterador():
     agrupador()
     calcularMedia(0)
     calcularMedia(1)
-    pintaPuntos()
+    #pintaPuntos()
     actualizarCentroide()
-    print("Q previo: ", valorQtemp)
-    print("Q actual: ", valorQ)
+##    print("Q previo: ", valorQtemp)
+##    print("Q actual: ", valorQ)
 
-    
-
+def kmeans():
+    i = 1
+    iterador()
+    while(abs(valorQtemp-valorQ))>0.01:
+        iterador()
+        print("Q previo: ", valorQtemp)
+        print("Q actual: ", valorQ)
+        print("dif: ", abs(valorQtemp-valorQ))
+        print("i: ", i)
+        i+=1
 def calcularMatrizU():
     temp = []
     temp2 = []
@@ -110,7 +118,7 @@ def calcularMatrizU():
             temp += [dist]
             temp2 += [[j,i,dist]]
         indice=temp.index(min(temp))
-        valorQ += min(temp)
+        valorQ += (min(temp))**2
         MatU+= [temp2[indice]]
         
     
@@ -129,8 +137,7 @@ def calcularMedia(indice):
         temp = []
         for j in MatU:
             if i == j[0]:
-                temp += [j[1][indice]] #indice 0 para x y 1 para y
-        print(temp)        
+                temp += [j[1][indice]] #indice 0 para x y 1 para y    
         if indice == 0:
             centroidesX+=[float(sum(temp)) / max(len(temp), 1)]
         else:
